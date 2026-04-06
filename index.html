@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emergency Helper</title>
+
+<style>
+
+/* RESET */
+* {
+  box-sizing: border-box;
+}
+
+/* BODY */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #eef2ff, #e0f2fe);
+  color: #1e293b;
+}
+
+/* CONTAINER */
+.container {
+  max-width: 500px;
+  margin: auto;
+  padding: 18px;
+  text-align: center;
+}
+
+/* HEADINGS */
+h1 { font-size: 24px; color: #0f172a; }
+h2 { font-size: 20px; color: #334155; }
+
+/* BUTTONS */
+button {
+  width: 100%;
+  padding: 14px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+/* PRIMARY BUTTON */
+.primary {
+  background: #2563eb;
+  color: white;
+}
+
+/* SECONDARY BUTTON */
+.secondary {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+/* BIG EMERGENCY BUTTON */
+.big-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  font-size: 17px;
+  font-weight: bold;
+  box-shadow: 0 6px 14px rgba(239, 68, 68, 0.3);
+}
+
+/* CARDS */
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 14px;
+  margin-top: 12px;
+  text-align: left;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* TEXT */
+.steps { line-height: 1.6; }
+.note { color: #dc2626; }
+
+/* HIDDEN */
+.hidden { display: none; }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- HOME -->
+<div id="homeScreen">
+
+  <h1>🚑 Emergency Helper</h1>
+  <p><b>Quick guidance when you need it the most.</b></p>
+
+  <button class="big-btn" onclick="quickHelp()">🚨 Emergency Now</button>
+
+  <button class="primary" onclick="show('typeScreen')">Start Assistance</button>
+
+  <div class="card">
+    <h3>How it works</h3>
+    <p>1. Select your situation</p>
+    <p>2. Follow the steps</p>
+    <p>3. Take action quickly</p>
+  </div>
+
+  <div class="card">
+    <h3>Quick Tips</h3>
+    <p>• Stay calm</p>
+    <p>• Call for help</p>
+    <p>• Share your location if needed</p>
+  </div>
+
+</div>
+
+<!-- TYPE -->
+<div id="typeScreen" class="hidden">
+
+  <h2>Select Emergency</h2>
+
+  <button onclick="selectType('accident')">🚗 Accident</button>
+  <button onclick="selectType('fire')">🔥 Fire</button>
+  <button onclick="selectType('medical')">🏥 Medical</button>
+  <button onclick="selectType('crime')">🚨 Crime</button>
+
+</div>
+
+<!-- LEVEL -->
+<div id="levelScreen" class="hidden">
+
+  <h2>Select seriousness</h2>
+
+  <button onclick="selectLevel('low')">Low</button>
+  <button onclick="selectLevel('medium')">Medium</button>
+  <button onclick="selectLevel('high')">High</button>
+
+</div>
+
+<!-- RESULT -->
+<div id="resultScreen" class="hidden">
+
+  <h2>What to do</h2>
+
+  <div id="steps" class="card steps"></div>
+  <div id="avoid" class="card note"></div>
+
+  <h3>Quick Actions</h3>
+
+  <button class="primary" onclick="callNumber('108')">📞 Ambulance</button>
+  <button class="primary" onclick="callNumber('100')">🚓 Police</button>
+
+  <button class="secondary" onclick="shareLocation()">📲 Share Location</button>
+  <button class="secondary" onclick="findHospitals()">🏥 Nearby Hospitals</button>
+
+</div>
+
+</div>
+
+<script>
+
+let type = "";
+let level = "";
+
+function quickHelp() {
+  type = "medical";
+  level = "high";
+  showSteps();
+  show("resultScreen");
+}
+
+function selectType(t) {
+  type = t;
+
+  if (t === "crime") {
+    level = "direct";
+    showSteps();
+    show("resultScreen");
+  } else {
+    show("levelScreen");
+  }
+}
+
+function selectLevel(l) {
+  level = l;
+  showSteps();
+  show("resultScreen");
+}
+
+function speak(text) {
+  let msg = new SpeechSynthesisUtterance(text);
+  speechSynthesis.speak(msg);
+}
+
+function showSteps() {
+
+  let steps = "";
+  let avoid = "";
+
+  if (type === "accident") {
+    steps = `
+    • Check breathing<br>
+    • Call ambulance<br>
+    • Stop bleeding<br>
+    • Keep calm
+    `;
+    avoid = "Avoid moving injured person";
+  }
+
+  if (type === "fire") {
+    steps = `
+    • Leave area immediately<br>
+    • Stay low<br>
+    • Use extinguisher if safe<br>
+    • Call help
+    `;
+    avoid = "Do not use lift";
+  }
+
+  if (type === "medical") {
+    steps = `
+    • Check response<br>
+    • Call ambulance<br>
+    • Give first aid<br>
+    • Stay nearby
+    `;
+    avoid = "Do not give food if unconscious";
+  }
+
+  if (type === "crime") {
+    steps = `
+    • Stay calm<br>
+    • Move to safe place<br>
+    • Call police<br>
+    • Inform someone
+    `;
+    avoid = "Do not confront attacker";
+  }
+
+  document.getElementById("steps").innerHTML = steps;
+  document.getElementById("avoid").innerHTML = "⚠️ " + avoid;
+
+  speak(steps.replace(/<br>/g, " "));
+}
+
+function callNumber(num) {
+  window.location.href = "tel:" + num;
+}
+
+function shareLocation() {
+  navigator.geolocation.getCurrentPosition(pos => {
+    let link = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+    window.open(`https://wa.me/?text=Emergency! My location: ${link}`);
+  });
+}
+
+function findHospitals() {
+  window.open("https://www.google.com/maps/search/hospitals+near+me");
+}
+
+function show(id) {
+  document.querySelectorAll(".container > div").forEach(div => {
+    div.classList.add("hidden");
+  });
+  document.getElementById(id).classList.remove("hidden");
+}
+
+</script>
+
+</body>
+</html>
